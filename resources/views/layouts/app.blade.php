@@ -28,16 +28,21 @@
 </head>
 <body class="min-h-screen bg-white font-sans text-gray-800 overflow-x-hidden" style="font-family: 'Inter', sans-serif;">
 
+    @php $adminOnly = auth()->check() && auth()->user()->isAdmin(); @endphp
+
     {{-- Navbar --}}
     <nav class="bg-neutral-900 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex items-center justify-between h-16">
 
-                <a href="{{ route('home') }}" class="group flex items-baseline gap-1 shrink-0 transition-transform duration-300 hover:scale-105">
+                <a href="{{ $adminOnly ? route('admin.dashboard') : route('home') }}" class="group flex items-baseline gap-1 shrink-0 transition-transform duration-300 hover:scale-105">
                     <span class="text-xl font-black tracking-tight text-brand-500 transition-colors duration-300 group-hover:text-white">THE</span>
                     <span class="text-xl font-black tracking-tight text-white transition-colors duration-300 group-hover:text-brand-500">OVRLNDR</span>
                 </a>
 
+                @if($adminOnly)
+                    @include('layouts._nav-admin')
+                @else
                 @include('layouts._nav-desktop')
 
                 <button id="nav-toggle" class="sm:hidden p-2 rounded-lg text-neutral-300 hover:bg-neutral-800 transition-colors">
@@ -48,9 +53,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
+                @endif
             </div>
 
-            @include('layouts._nav-mobile')
+            @unless($adminOnly)
+                @include('layouts._nav-mobile')
+            @endunless
         </div>
     </nav>
 
@@ -83,6 +91,7 @@
         @yield('content')
     </main>
 
+    @unless($adminOnly)
     <footer class="mt-16 bg-neutral-900 text-neutral-300">
         <div class="max-w-6xl mx-auto px-4 py-12">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
@@ -139,6 +148,7 @@
             </div>
         </div>
     </footer>
+    @endunless
 
     @unless(request()->routeIs('admin.*'))
     <a href="https://wa.me/{{ config('booking.whatsapp_number') }}?text={{ urlencode(__('nav.whatsapp_float_message')) }}"
