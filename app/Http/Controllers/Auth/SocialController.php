@@ -28,20 +28,6 @@ class SocialController extends Controller
 
     public function callback(string $provider)
     {
-        try {
-            return $this->handleCallback($provider);
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            throw $e;
-        } catch (\Throwable $e) {
-            \Log::error('Social login failed: ' . get_class($e) . ': ' . $e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
-
-            return redirect()->route('login')
-                ->with('error', 'DIAG ' . class_basename($e) . ': ' . \Illuminate\Support\Str::limit($e->getMessage(), 300) . ' @ ' . basename($e->getFile()) . ':' . $e->getLine());
-        }
-    }
-
-    protected function handleCallback(string $provider)
-    {
         abort_if(! in_array($provider, $this->allowed), 404);
 
         try {
