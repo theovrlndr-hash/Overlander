@@ -12,6 +12,7 @@ class Booking extends Model
         'guest_name', 'guest_email', 'guest_phone',
         'trip_date', 'pax', 'message', 'total_price', 'status',
         'payment_method', 'payment_scheme', 'deposit_amount', 'payment_status',
+        'reminder_week_sent_at', 'reminder_day_sent_at',
     ];
 
     protected function casts(): array
@@ -22,6 +23,8 @@ class Booking extends Model
             'total_price' => 'decimal:2',
             'deposit_amount' => 'decimal:2',
             'is_custom' => 'boolean',
+            'reminder_week_sent_at' => 'datetime',
+            'reminder_day_sent_at' => 'datetime',
         ];
     }
 

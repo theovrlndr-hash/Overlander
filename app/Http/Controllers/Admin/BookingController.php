@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
-    public function index(Request $request)
+    private function filtered(Request $request)
     {
         $query = Booking::with(['user', 'package', 'packagePlan', 'destinations'])->latest();
 
@@ -27,6 +27,53 @@ class BookingController extends Controller
                 ->where('guest_name', 'like', "%{$s}%")
                 ->orWhere('guest_email', 'like', "%{$s}%"));
         }
+
+        return $query;
+    }
+
+    public function export(Request $request)
+    {
+        $bookings = $this->filtered($request)->get();
+
+        // Spreadsheet apps run cells that start with = + - @ as formulas, and guests type these fields freely.
+        $safe = fn ($v) => is_string($v) && $v !== '' && str_contains('=+-@', $v[0]) ? "'" . $v : $v;
+
+        return response()->streamDownload(function () use ($bookings, $safe) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel reads accents correctly
+            fputcsv($out, [
+                'booking_id', 'created_at', 'status', 'guest_name', 'guest_email', 'guest_phone',
+                'trip', 'plan', 'trip_date', 'travelers', 'total_price', 'payment_scheme', 'payment_status',
+                'preferred_route', 'custom_request', 'message',
+            ]);
+
+            foreach ($bookings as $b) {
+                fputcsv($out, array_map($safe, [
+                    $b->id,
+                    $b->created_at->toDateTimeString(),
+                    $b->status,
+                    $b->guest_name,
+                    $b->guest_email,
+                    $b->guest_phone,
+                    $b->is_custom ? 'Custom trip' : $b->package?->name,
+                    $b->packagePlan?->name,
+                    $b->trip_date->toDateString(),
+                    $b->pax,
+                    $b->total_price,
+                    $b->payment_scheme,
+                    $b->payment_status,
+                    $b->destinations->pluck('name')->join(' > '),
+                    $b->custom_request,
+                    $b->message,
+                ]));
+            }
+            fclose($out);
+        }, 'overlander-bookings-' . now()->format('Y-m-d') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    public function index(Request $request)
+    {
+        $query = $this->filtered($request);
 
         $bookings = $query->paginate(20)->withQueryString();
         $waLang = $request->query('wa') === 'en' ? 'en' : 'id';

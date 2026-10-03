@@ -27,6 +27,8 @@
             </select>
         </div>
         <button type="submit" class="px-4 py-2 bg-brand-500 text-white text-sm font-medium rounded-xl hover:bg-brand-600">Search</button>
+        <a href="{{ route('admin.bookings.export', request()->only(['status', 'search'])) }}"
+           class="px-4 py-2 border border-gray-300 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">Export CSV</a>
     </form>
 
     <div class="flex items-center gap-2 text-xs text-gray-500">

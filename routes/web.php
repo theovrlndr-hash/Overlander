@@ -148,7 +148,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('events', Admin\EventController::class)->except(['show']);
 
     Route::get('/bookings', [Admin\BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/calendar', [Admin\BookingController::class, 'calendar'])->name('bookings.calendar');
+    Route::get('/bookings/export', [Admin\BookingController::class, 'export'])->name('bookings.export');
+    Route::get('/bookings/calendar',[Admin\BookingController::class, 'calendar'])->name('bookings.calendar');
     Route::patch('/bookings/{booking}/status', [Admin\BookingController::class, 'updateStatus'])->name('bookings.status');
 
     Route::get('/reviews', [Admin\ReviewAdminController::class, 'index'])->name('reviews.index');
