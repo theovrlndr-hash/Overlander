@@ -35,9 +35,8 @@
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex items-center justify-between h-16">
 
-                <a href="{{ $adminOnly ? route('admin.dashboard') : route('home') }}" class="group flex items-baseline gap-1 shrink-0 transition-transform duration-300 hover:scale-105">
-                    <span class="text-xl font-black tracking-tight text-brand-500 transition-colors duration-300 group-hover:text-white">THE</span>
-                    <span class="text-xl font-black tracking-tight text-white transition-colors duration-300 group-hover:text-brand-500">OVRLNDR</span>
+                <a href="{{ $adminOnly ? route('admin.dashboard') : route('home') }}" class="group shrink-0 transition-transform duration-300 hover:scale-105">
+                    @include('layouts._logo')
                 </a>
 
                 @if($adminOnly)
@@ -96,7 +95,7 @@
         <div class="max-w-6xl mx-auto px-4 py-12">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
                 <div>
-                    <p class="text-xl font-black mb-2"><span class="text-brand-500">THE</span> <span class="text-white">OVRLNDR</span></p>
+                    <div class="mb-3">@include('layouts._logo')</div>
                     <p class="text-sm text-neutral-400 leading-relaxed">{{ __('nav.footer_tagline') }}</p>
 
                     <form method="POST" action="{{ route('newsletter.subscribe') }}" class="mt-5">

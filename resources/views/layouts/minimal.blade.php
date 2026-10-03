@@ -12,9 +12,8 @@
 <body class="min-h-screen bg-gray-50 font-sans text-gray-800" style="font-family: 'Inter', sans-serif;">
 
     <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12">
-        <a href="{{ route('home') }}" class="group flex items-baseline gap-1 mb-8 transition-transform duration-300 hover:scale-105">
-            <span class="text-2xl font-black tracking-tight text-brand-500 transition-colors duration-300 group-hover:text-neutral-900">THE</span>
-            <span class="text-2xl font-black tracking-tight text-neutral-900 transition-colors duration-300 group-hover:text-brand-500">OVRLNDR</span>
+        <a href="{{ route('home') }}" class="group mb-8 transition-transform duration-300 hover:scale-105">
+            @include('layouts._logo', ['tone' => 'dark', 'size' => 'text-2xl'])
         </a>
 
         @yield('content')
