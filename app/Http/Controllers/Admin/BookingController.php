@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\BookingStatusMail;
 use App\Models\Booking;
+use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -27,7 +29,43 @@ class BookingController extends Controller
         }
 
         $bookings = $query->paginate(20)->withQueryString();
-        return view('admin.bookings.index', compact('bookings'));
+        $waLang = $request->query('wa') === 'en' ? 'en' : 'id';
+
+        return view('admin.bookings.index', compact('bookings', 'waLang'));
+    }
+
+    public function calendar(Request $request)
+    {
+        $raw = (string) $request->query('month', '');
+        $month = preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $raw)
+            ? Carbon::createFromFormat('Y-m-d', $raw . '-01')->startOfDay()
+            : now()->startOfMonth();
+
+        $showCancelled = $request->boolean('cancelled');
+        $packageFilter = (string) $request->query('package', '');
+
+        $query = Booking::with(['package', 'destinations'])
+            ->whereBetween('trip_date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
+            ->orderBy('trip_date')->orderBy('id');
+
+        if (! $showCancelled) {
+            $query->where('status', '!=', 'cancelled');
+        }
+
+        if ($packageFilter === 'custom') {
+            $query->where('is_custom', true);
+        } elseif (ctype_digit($packageFilter)) {
+            $query->where('package_id', (int) $packageFilter);
+        }
+
+        $bookings = $query->get();
+        $byDate = $bookings->groupBy(fn ($b) => $b->trip_date->toDateString());
+        $packages = Package::orderBy('name')->get(['id', 'name', 'capacity']);
+        $selectedPackage = ctype_digit($packageFilter) ? $packages->firstWhere('id', (int) $packageFilter) : null;
+
+        return view('admin.bookings.calendar', compact(
+            'month', 'bookings', 'byDate', 'packages', 'selectedPackage', 'packageFilter', 'showCancelled'
+        ));
     }
 
     public function updateStatus(Request $request, Booking $booking)

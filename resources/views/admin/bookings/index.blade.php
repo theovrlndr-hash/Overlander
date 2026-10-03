@@ -29,6 +29,14 @@
         <button type="submit" class="px-4 py-2 bg-brand-500 text-white text-sm font-medium rounded-xl hover:bg-brand-600">Search</button>
     </form>
 
+    <div class="flex items-center gap-2 text-xs text-gray-500">
+        <span>WhatsApp message language:</span>
+        @foreach(\App\Support\BookingMessages::LANGS as $code => $label)
+            <a href="{{ request()->fullUrlWithQuery(['wa' => $code]) }}"
+               class="px-2.5 py-1 rounded-full border {{ $waLang === $code ? 'bg-brand-500 text-white border-brand-500' : 'border-gray-200 text-gray-600 hover:bg-gray-50' }}">{{ $label }}</a>
+        @endforeach
+    </div>
+
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -40,6 +48,7 @@
                         <th class="text-center px-6 py-3 font-medium">Pax</th>
                         <th class="text-right px-6 py-3 font-medium">Total</th>
                         <th class="text-center px-6 py-3 font-medium">Status</th>
+                        <th class="text-left px-6 py-3 font-medium">WhatsApp</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -76,9 +85,24 @@
                                 </select>
                             </form>
                         </td>
+                        <td class="px-6 py-3">
+                            @php $templates = \App\Support\BookingMessages::available($booking); @endphp
+                            @if(\App\Support\BookingMessages::phone($booking->guest_phone))
+                            <select onchange="if (this.value) { window.open(this.value, '_blank', 'noopener'); this.selectedIndex = 0; }"
+                                    aria-label="Send a WhatsApp message"
+                                    class="text-xs border border-green-200 text-green-700 bg-green-50 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-green-100 focus:border-green-400 focus:ring-2 focus:ring-green-100">
+                                <option value="">💬 Message…</option>
+                                @foreach($templates as $key => $label)
+                                    <option value="{{ \App\Support\BookingMessages::url($booking, $key, $waLang) }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @else
+                                <span class="text-xs text-gray-300">No phone</span>
+                            @endif
+                        </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No bookings yet.</td></tr>
+                    <tr><td colspan="7"class="px-6 py-12 text-center text-gray-400">No bookings yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>
