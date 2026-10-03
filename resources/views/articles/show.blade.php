@@ -14,6 +14,8 @@
     <h1 class="text-3xl font-black text-gray-900">{{ $article->title }}</h1>
     <p class="text-sm text-gray-400">{{ $article->published_at?->format('d M Y') }} @if($article->author) · {{ __('articles.by') }} {{ $article->author->name }} @endif</p>
 
+    @include('_share', ['title' => $article->title . ' — Overlander'])
+
     <img src="{{ $article->cover_photo_url }}" class="w-full h-72 object-cover rounded-2xl" alt="{{ $article->title }}">
 
     <div class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-line">{{ $article->content }}</div>

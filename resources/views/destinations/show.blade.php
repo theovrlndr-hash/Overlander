@@ -25,6 +25,8 @@
 <div class="max-w-6xl mx-auto px-4 py-10 grid sm:grid-cols-3 gap-10">
     <div class="sm:col-span-2 space-y-8">
 
+        @include('_share', ['title' => $destination->name . ' — Overlander'])
+
         @if($destination->description)
         <div>
             <h2 class="text-lg font-bold text-gray-900 mb-2">{{ __('destinations.about_title') }}</h2>
@@ -57,6 +59,8 @@
             </ul>
         </div>
         @endif
+
+        @include('destinations._guide', ['destination' => $destination])
 
         @if($destination->activities->count())
         <div>

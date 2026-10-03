@@ -67,6 +67,41 @@
         <textarea name="tips_id" rows="5" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-100">{{ old('tips_id', $destination->tips_id ?? '') }}</textarea>
     </div>
 
+    {{-- Practical guide: shown on the destination page and in "Before You Go" on packages --}}
+    <div class="sm:col-span-2 border-t border-gray-100 pt-4">
+        <p class="text-sm font-semibold text-gray-800 mb-1">Travel guide</p>
+        <p class="text-xs text-gray-400 mb-3">One point per line. Leave a box empty to hide that part.</p>
+
+        @php $selectedMonths = old('best_months', $destination?->bestMonthNumbers() ?? []); @endphp
+        <label class="block text-sm font-medium text-gray-700 mb-2">Best months to visit</label>
+        <div class="flex flex-wrap gap-2 mb-4">
+            @for($m = 1; $m <= 12; $m++)
+                <label class="cursor-pointer">
+                    <input type="checkbox" name="best_months[]" value="{{ $m }}" class="peer sr-only" @checked(in_array($m, array_map('intval', $selectedMonths)))>
+                    <span class="inline-block px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 text-gray-500 peer-checked:bg-brand-500 peer-checked:text-white peer-checked:border-brand-500 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-300">
+                        {{ \Illuminate\Support\Carbon::create(2026, $m, 1)->format('M') }}
+                    </span>
+                </label>
+            @endfor
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+            @foreach([
+                'best_time' => 'Best time notes',
+                'packing' => 'What to bring',
+                'provided' => 'What we provide (only if you really supply it)',
+                'safety' => 'Safety notes',
+            ] as $field => $label)
+                @foreach(['en' => 'English', 'id' => 'Indonesia'] as $lang => $langLabel)
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $label }} <span class="text-xs text-gray-400">({{ $langLabel }})</span></label>
+                    <textarea name="{{ $field }}_{{ $lang }}" rows="4" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:border-brand-400 focus:ring-2 focus:ring-brand-100">{{ old($field . '_' . $lang, $destination->{$field . '_' . $lang} ?? '') }}</textarea>
+                </div>
+                @endforeach
+            @endforeach
+        </div>
+    </div>
+
     <div class="sm:col-span-2 grid grid-cols-3 gap-3">
         @foreach(['nature_level' => 'Nature Level', 'culture_level' => 'Culture Level', 'heritage_level' => 'Heritage Level'] as $field => $label)
         <div>

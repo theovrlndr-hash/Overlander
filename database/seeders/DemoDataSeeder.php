@@ -206,6 +206,7 @@ class DemoDataSeeder extends Seeder
         ];
 
         $destinationTips = require database_path('data/destination_tips.php');
+        $destinationGuides = require database_path('data/destination_guides.php');
 
         $destinations = [];
         foreach ($destinationsData as $d) {
@@ -227,6 +228,15 @@ class DemoDataSeeder extends Seeder
                     'heritage_level' => $d['heritage'],
                     'tips_en' => $destinationTips[Str::slug($d['name'])]['en'] ?? null,
                     'tips_id' => $destinationTips[Str::slug($d['name'])]['id'] ?? null,
+                    'best_months' => isset($destinationGuides[Str::slug($d['name'])]) ? implode(',', $destinationGuides[Str::slug($d['name'])]['months']) : null,
+                    'best_time_en' => $destinationGuides[Str::slug($d['name'])]['best_time']['en'] ?? null,
+                    'best_time_id' => $destinationGuides[Str::slug($d['name'])]['best_time']['id'] ?? null,
+                    'packing_en' => $destinationGuides[Str::slug($d['name'])]['packing']['en'] ?? null,
+                    'packing_id' => $destinationGuides[Str::slug($d['name'])]['packing']['id'] ?? null,
+                    'provided_en' => $destinationGuides[Str::slug($d['name'])]['provided']['en'] ?? null,
+                    'provided_id' => $destinationGuides[Str::slug($d['name'])]['provided']['id'] ?? null,
+                    'safety_en' => $destinationGuides[Str::slug($d['name'])]['safety']['en'] ?? null,
+                    'safety_id' => $destinationGuides[Str::slug($d['name'])]['safety']['id'] ?? null,
                     'cover_photo' => $d['cover_photo'] ?? $d['photo'],
                     'is_active' => $d['active'] ?? true,
                     'created_by' => $admin->id,

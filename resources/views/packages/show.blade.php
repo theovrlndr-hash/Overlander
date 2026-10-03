@@ -125,6 +125,8 @@
     <div class="grid sm:grid-cols-3 gap-10">
     <div class="sm:col-span-2 space-y-8">
 
+        @include('_share', ['title' => $package->name . ' — Overlander'])
+
         @if($package->description)
         <div>
             <h2 class="text-lg font-bold text-gray-900 mb-2">{{ __('packages.about_title') }}</h2>
@@ -154,6 +156,29 @@
             @if($routePoints->isNotEmpty())
             <div id="route-map" class="rounded-2xl overflow-hidden border border-gray-200" style="height: 320px;"></div>
             @endif
+        </div>
+        @endif
+
+        @php
+            $guideStops = $package->destinations->filter(fn ($d) => $d->best_months || $d->best_time || $d->packing || $d->provided || $d->safety);
+        @endphp
+        @if($guideStops->isNotEmpty())
+        <div>
+            <h2 class="text-lg font-bold text-gray-900 mb-1">{{ __('guide.before_you_go_title') }}</h2>
+            <p class="text-sm text-gray-500 mb-4">{{ __('guide.before_you_go_hint') }}</p>
+            <div class="space-y-3">
+                @foreach($guideStops as $stop)
+                <details class="group rounded-2xl border border-gray-200 bg-gray-50/60 open:bg-white" @if($loop->first) open @endif>
+                    <summary class="flex items-center justify-between gap-3 cursor-pointer list-none px-5 py-4 font-semibold text-gray-900">
+                        <span><span class="text-brand-500 mr-1">{{ $loop->iteration }}.</span> {{ $stop->name }}</span>
+                        <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-5 pb-5">
+                        @include('destinations._guide', ['destination' => $stop])
+                    </div>
+                </details>
+                @endforeach
+            </div>
         </div>
         @endif
 

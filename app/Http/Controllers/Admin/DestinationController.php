@@ -88,7 +88,7 @@ class DestinationController extends Controller
 
     private function validated(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
@@ -101,12 +101,28 @@ class DestinationController extends Controller
             'point_of_interest_id' => 'nullable|string',
             'tips_en' => 'nullable|string',
             'tips_id' => 'nullable|string',
+            'best_months' => 'nullable|array',
+            'best_months.*' => 'integer|between:1,12',
+            'best_time_en' => 'nullable|string',
+            'best_time_id' => 'nullable|string',
+            'packing_en' => 'nullable|string',
+            'packing_id' => 'nullable|string',
+            'provided_en' => 'nullable|string',
+            'provided_id' => 'nullable|string',
+            'safety_en' => 'nullable|string',
+            'safety_id' => 'nullable|string',
             'nature_level' => 'nullable|integer|min:1|max:5',
             'culture_level' => 'nullable|integer|min:1|max:5',
             'heritage_level' => 'nullable|integer|min:1|max:5',
             'cover_photo' => 'nullable|image|max:4096',
             'is_active' => 'nullable|boolean',
         ]);
+
+        // The month checkboxes arrive as an array (absent when none is ticked) and are stored as "4,5,6".
+        $months = collect($data['best_months'] ?? [])->map(fn ($m) => (int) $m)->unique()->sort()->values();
+        $data['best_months'] = $months->isEmpty() ? null : $months->implode(',');
+
+        return $data;
     }
 
     private function syncActivities(Destination $destination, Request $request): void
