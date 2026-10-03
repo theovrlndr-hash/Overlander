@@ -171,12 +171,10 @@
         </div>
         @endif
 
-        @if($destination->packages->isNotEmpty())
-        <a href="{{ route('packages.show', $destination->packages->first()) }}"
+        <a href="{{ route('packages.index') }}"
            class="btn-pop block text-center px-6 py-3 bg-brand-500 text-white rounded-xl font-semibold hover:bg-brand-600 transition-colors">
             {{ __('destinations.book_now') }}
         </a>
-        @endif
     </div>
 </div>
 
