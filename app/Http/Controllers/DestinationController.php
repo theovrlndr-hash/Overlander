@@ -10,7 +10,7 @@ class DestinationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Destination::with('categories')->where('is_active', true);
+        $query = Destination::with('categories')->withAvg('reviews', 'rating')->withCount('reviews')->where('is_active', true);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
@@ -30,8 +30,10 @@ class DestinationController extends Controller
     {
         $destination->load(['categories', 'photos', 'activities', 'packages']);
 
-        $reviews = $destination->reviews()->latest()->paginate(10);
+        $reviews = $destination->reviews()->with('photos')->latest()->paginate(10);
+        $ratingAvg = $destination->reviews()->avg('rating');
+        $ratingCount = $destination->reviews()->count();
 
-        return view('destinations.show', compact('destination', 'reviews'));
+        return view('destinations.show', compact('destination', 'reviews', 'ratingAvg', 'ratingCount'));
     }
 }

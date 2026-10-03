@@ -122,6 +122,28 @@ class Package extends Model
         return max(0, $this->capacity - $booked);
     }
 
+    /**
+     * Rating of a package = average of the reviews of the destinations on its route.
+     * One query for any number of packages: [package_id => ['avg' => float, 'count' => int]].
+     */
+    public static function ratingSummaries(iterable $packageIds): array
+    {
+        $ids = collect($packageIds)->values()->all();
+
+        if (! $ids) {
+            return [];
+        }
+
+        return \Illuminate\Support\Facades\DB::table('package_destination')
+            ->join('reviews', 'reviews.destination_id', '=', 'package_destination.destination_id')
+            ->whereIn('package_destination.package_id', $ids)
+            ->groupBy('package_destination.package_id')
+            ->selectRaw('package_destination.package_id as package_id, AVG(reviews.rating) as avg, COUNT(*) as count')
+            ->get()
+            ->mapWithKeys(fn ($r) => [$r->package_id => ['avg' => (float) $r->avg, 'count' => (int) $r->count]])
+            ->all();
+    }
+
     public function hasAccommodationOption(): bool
     {
         return $this->plans->flatMap->features->contains(fn ($f) => str_contains(strtolower($f), 'accommodation'));

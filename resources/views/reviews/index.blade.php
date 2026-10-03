@@ -27,6 +27,7 @@
                     onclick="const p=this.previousElementSibling; const clamped=p.classList.toggle('line-clamp-3'); this.textContent = clamped ? this.dataset.labelMore : this.dataset.labelLess;">
                 {{ __('reviews.read_more') }}
             </button>
+            @include('_review-photos', ['review' => $review])
             @if($review->destination)
                 <a href="{{ route('destinations.show', $review->destination) }}" class="inline-block text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 hover:bg-brand-100">{{ $review->destination->name }}</a>
             @else

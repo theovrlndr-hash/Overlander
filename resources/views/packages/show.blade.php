@@ -29,6 +29,7 @@
         @if($package->destinations->count() > 1)
             <p class="text-neutral-200 text-sm mt-1">📍 {{ $package->destinations->pluck('name')->join(' → ') }}</p>
         @endif
+        @include('_rating', ['avg' => $rating['avg'] ?? 0, 'count' => $rating['count'] ?? 0, 'dark' => true, 'class' => 'mt-1 text-sm'])
     </div>
 
     @if(count($galleryPhotos) > 1)
@@ -515,7 +516,15 @@
     const latLngs = points.map(p => [p.lat, p.lng]);
 
     points.forEach((p, i) => {
-        L.marker([p.lat, p.lng])
+        // Numbered pins so the visiting order reads at a glance.
+        const icon = L.divIcon({
+            className: '',
+            html: `<div style="width:28px;height:28px;border-radius:9999px;background:#f9530f;color:#fff;font:700 13px/28px Inter,sans-serif;text-align:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)">${i + 1}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14],
+        });
+        L.marker([p.lat, p.lng], { icon })
             .addTo(map)
             .bindPopup(`${i + 1}. ${p.name}`);
     });

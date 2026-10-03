@@ -34,6 +34,7 @@
             <div class="p-4">
                 <p class="font-semibold text-gray-800">{{ $destination->name }}</p>
                 <p class="text-xs text-gray-500">{{ $destination->location }}</p>
+                @include('_rating', ['avg' => $destination->reviews_avg_rating ?? 0, 'count' => $destination->reviews_count, 'class' => 'mt-1'])
                 <div class="flex flex-wrap gap-1 mt-2">
                     @foreach($destination->categories as $cat)
                         <span class="text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">{{ $cat->name }}</span>

@@ -28,6 +28,7 @@
                 <div class="p-4">
                     <span class="text-xs px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">{{ $package->category?->name }}</span>
                     <p class="font-semibold text-gray-800 mt-2 line-clamp-2">{{ $package->name }}</p>
+                    @include('_rating', ['avg' => $ratings[$package->id]['avg'] ?? 0, 'count' => $ratings[$package->id]['count'] ?? 0, 'class' => 'mt-1'])
                 </div>
             </a>
             @include('_wishlist-heart', ['package' => $package, 'position' => 'absolute top-3 right-3 z-10'])

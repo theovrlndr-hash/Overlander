@@ -18,6 +18,7 @@
         </div>
         <h1 class="text-3xl sm:text-4xl font-black">{{ $destination->name }}</h1>
         <p class="text-neutral-200 text-sm mt-1">📍 {{ $destination->location }}</p>
+        @include('_rating', ['avg' => $ratingAvg ?? 0, 'count' => $ratingCount ?? 0, 'dark' => true, 'class' => 'mt-1 text-sm'])
     </div>
 </div>
 
@@ -84,7 +85,7 @@
             <h2 class="text-lg font-bold text-gray-900 mb-4">{{ __('destinations.reviews_title') }}</h2>
 
             @auth
-            <form method="POST" action="{{ route('reviews.store', $destination) }}" class="bg-gray-50 rounded-2xl p-4 mb-6">
+            <form method="POST" action="{{ route('reviews.store', $destination) }}" enctype="multipart/form-data" class="bg-gray-50 rounded-2xl p-4 mb-6">
                 @csrf
                 <p class="text-sm font-medium text-gray-700 mb-2">{{ __('destinations.review_form_label') }}</p>
                 <div class="flex gap-1 mb-3" id="rating-stars">
@@ -96,6 +97,14 @@
                 </div>
                 <textarea name="comment" rows="2" placeholder="{{ __('destinations.review_placeholder') }}"
                           class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm mb-3 focus:border-brand-400 focus:ring-2 focus:ring-brand-100"></textarea>
+                <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('destinations.review_photos_label') }}</label>
+                    <input type="file" name="photos[]" id="review-photos" accept="image/jpeg,image/png,image/webp" multiple
+                           class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-brand-50 file:text-brand-600 file:font-medium hover:file:bg-brand-100 file:cursor-pointer">
+                    <p class="text-[11px] text-gray-400 mt-1" id="review-photos-hint" data-max-msg="{{ __('destinations.review_photos_max') }}">{{ __('destinations.review_photos_hint') }}</p>
+                    @error('photos') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    @error('photos.*') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
                 <button type="submit" class="btn-pop px-5 py-2 bg-brand-500 text-white rounded-xl text-sm font-medium hover:bg-brand-600">{{ __('destinations.review_submit') }}</button>
             </form>
             @else
@@ -116,6 +125,7 @@
                             <span class="text-yellow-500 text-xs">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</span>
                         </div>
                         <p class="text-sm text-gray-600 mt-1">{{ $review->comment }}</p>
+                        @include('_review-photos', ['review' => $review])
                     </div>
                 </div>
                 @empty
@@ -165,5 +175,27 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    const input = document.getElementById('review-photos');
+    const hint = document.getElementById('review-photos-hint');
+    if (! input) return;
+    const original = hint.textContent;
+
+    input.addEventListener('change', () => {
+        if (input.files.length > 3) {
+            input.value = '';
+            hint.textContent = hint.dataset.maxMsg;
+            hint.classList.add('text-red-500');
+        } else {
+            hint.textContent = original;
+            hint.classList.remove('text-red-500');
+        }
+    });
+})();
+</script>
+@endpush
 
 @endsection

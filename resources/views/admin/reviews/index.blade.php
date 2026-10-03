@@ -86,6 +86,7 @@
                     @else
                         <p class="text-gray-400 text-xs italic mt-1">No comment</p>
                     @endif
+                    @include('_review-photos', ['review' => $review])
                 </div>
                 <div class="flex flex-col gap-1.5 shrink-0">
                     <form method="POST" action="{{ route('admin.reviews.toggle-featured', $review) }}">

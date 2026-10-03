@@ -19,14 +19,18 @@ class PackageController extends Controller
         $packages = $query->orderByDesc('is_featured')->latest()->paginate(9)->withQueryString();
         $categories = Category::where('type', 'package')->orderBy('name')->get();
 
-        return view('packages.index', compact('packages', 'categories'));
+        $ratings = Package::ratingSummaries($packages->pluck('id'));
+
+        return view('packages.index', compact('packages', 'categories', 'ratings'));
     }
 
     public function show(Package $package)
     {
         $package->load(['category', 'plans', 'destinations', 'itineraries']);
 
-        return view('packages.show', compact('package'));
+        $rating = Package::ratingSummaries([$package->id])[$package->id] ?? null;
+
+        return view('packages.show', compact('package', 'rating'));
     }
 
     public function availability(Request $request, Package $package)

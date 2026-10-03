@@ -10,7 +10,7 @@ class ReviewAdminController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Review::with(['destination', 'user'])->latest();
+        $query = Review::with(['destination', 'user', 'photos'])->latest();
 
         if ($request->filled('search')) {
             $s = $request->search;
